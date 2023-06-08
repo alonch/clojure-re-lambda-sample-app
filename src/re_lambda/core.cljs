@@ -1,7 +1,7 @@
 (ns re-lambda.core
   (:require [cljs.core.async.impl.channels :refer [ManyToManyChannel]]
             [cljs.core.async.impl.protocols :refer [Channel]]
-            [clojure.core.async :as a :refer [<! >! chan go]]))
+            [clojure.core.async :as a :refer [<! >! go]]))
 
 
 (defn channel?

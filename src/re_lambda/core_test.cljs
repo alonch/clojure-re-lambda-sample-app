@@ -1,8 +1,6 @@
 (ns re-lambda.core-test
-  (:require [cljs.test :refer [async]]
-            [clojure.core.async :refer [<! go]]
-            [clojure.core.async :as a]
-            [clojure.test :refer [deftest is testing]]
+  (:require [cljs.test :refer [async deftest is testing]]
+            [clojure.core.async :as a :refer [<! go]]
             [re-lambda.core :as rl]))
 
 (deftest test-apply-co-effects

@@ -2,7 +2,6 @@
   (:require ["xhr2" :as xhr2]
             [cljs-http.client :as http]
             [cljs.core.async :refer [<! go]]
-            [clojure.core.async :refer [take!]]
             [re-lambda.core :refer [create-event-handler]]
             [utils.core :refer [env]]))
 
@@ -27,7 +26,7 @@
           
 
 (defn get-pagerduty-api-key []
-  (or (get env "PAGERDUTY_API_KEY") "u+R_zCaNTjfVdFMcUHpw"))
+  (or (get env "PAGERDUTY_API_KEY") "ABC"))
 
 (def fetch-incidents (create-event-handler
                       pagerduty-handler
