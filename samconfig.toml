@@ -1,0 +1,10 @@
+version = 0.1
+[default]
+[default.deploy]
+[default.deploy.parameters]
+stack_name = "clojure-aws-lambda-example"
+s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-l4e62fzmept6"
+s3_prefix = "clojure-aws-lambda-example"
+region = "us-west-2"
+capabilities = "CAPABILITY_IAM"
+image_repositories = []

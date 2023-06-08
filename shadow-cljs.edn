@@ -1,0 +1,17 @@
+{:source-paths ["src"]
+ :dependencies [[cljs-http/cljs-http "0.1.46"]]
+ :npm-deps {"xhr2" " 0.2.1"} 
+ :repl-options {:nrepl-middleware [shadow.cljs.devtools.server.nrepl/middleware]}
+ :dev-http {8080 "target/"}
+ :builds {:test {:target    :node-test
+                 :output-to "out/node-tests.js"
+                 :ns-regexp "-test$"
+                 :autorun   true}
+          :lib {:target :node-library
+                :exports {:handler webhook.core/handler
+                          :fetchIncidents pagerduty.core/main}
+                :output-to "dist/script.js"
+
+                ;; :devtools {:before-load-async webhook.core/stop
+                ;;            :after-load webhook.core/start}
+                }}}

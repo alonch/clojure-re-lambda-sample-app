@@ -1,0 +1,55 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  clojure-aws-lambda-example
+
+  Sample SAM Template for clojure-aws-lambda-example
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 20
+
+Resources:
+  ClojureAwsLambdaJavaFunction:
+    # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./
+      Handler: webhook.core
+      Runtime: java11
+      MemorySize: 256
+      Architectures:
+        - arm64
+      Tracing: Active
+      Environment:
+        Variables:
+          MERGIFY_API_KEY: '{{resolve:secretsmanager:/lambdas/pagerduty-mergify-integration/mergify-api-key}}'
+          PAGERDUTY_API_KEY: '{{resolve:secretsmanager:/lambdas/pagerduty-mergify-integration/pagerduty-api-key}}'
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /pagerduty
+            Method: POST
+            RestApiId:
+              Ref: ApiGatewayEndpoint
+      # Layers:
+      #   - arn:aws:lambda:us-west-2:901920570463:layer:aws-otel-java-wrapper-amd64-ver-1-23-0:1
+    Metadata:
+      BuildMethod: makefile
+
+  ApiGatewayEndpoint:
+    Type: 'AWS::Serverless::Api'
+    Properties:
+      StageName: Prod
+      Auth:
+        ApiKeyRequired: true
+        UsagePlan:
+          CreateUsagePlan: PER_API
+          UsagePlanName: GatewayAuthorization
+
+Outputs:
+  WebEndpoint:
+    Description: API Gateway endpoint URL for Prod stage
+    Value: !Sub "https://${ApiGatewayEndpoint}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
