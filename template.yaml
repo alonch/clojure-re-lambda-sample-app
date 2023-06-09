@@ -54,14 +54,15 @@ Resources:
   Xhr2Layer:
     Type: AWS::Serverless::LayerVersion
     Properties:
-      LayerName: dependencies
+      LayerName: xhr2
       Description: Dependencies for clojure sample app
-      ContentUri: dependencies/
+      ContentUri: layers/xhr2
       CompatibleRuntimes:
-        - nodejs6.10
-        - nodejs8.10
+        - nodejs16.x
       LicenseInfo: 'MIT'
       RetentionPolicy: Retain
+    Metadata:
+      BuildMethod: nodejs16.x
 
 Outputs:
   WebEndpoint:

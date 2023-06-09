@@ -1,4 +1,6 @@
 {
+  "name": "xhr2",
+  "version": "1.0.0",
   "devDependencies": {
     "shadow-cljs": "^2.23.3"
   },

@@ -1,0 +1,7 @@
+{
+  "name": "xhr2-layer",
+  "version": "0.0.1",
+  "dependencies": {
+    "xhr2": "^0.2.1"
+  }
+}
