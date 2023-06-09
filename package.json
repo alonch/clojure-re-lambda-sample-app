@@ -5,6 +5,7 @@
     "shadow-cljs": "^2.23.3"
   },
   "dependencies": {
-    "xhr2": "^0.2.1"
+    "xhr2": "^0.2.1",
+    "aws-xray-sdk-core": "^3.5.0"
   }
 }

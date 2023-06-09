@@ -23,7 +23,7 @@ Resources:
         - arm64
       Tracing: Active
       Layers:
-        - !Ref Xhr2Layer
+        - !Ref Layer
       Environment:
         Variables:
           MERGIFY_API_KEY: '{{resolve:secretsmanager:/lambdas/pagerduty-mergify-integration/mergify-api-key}}'
@@ -51,12 +51,12 @@ Resources:
           CreateUsagePlan: PER_API
           UsagePlanName: GatewayAuthorization
 
-  Xhr2Layer:
+  Layer:
     Type: AWS::Serverless::LayerVersion
     Properties:
-      LayerName: xhr2
+      LayerName: dependencies
       Description: Dependencies for clojure sample app
-      ContentUri: layers/xhr2
+      ContentUri: layers/
       CompatibleRuntimes:
         - nodejs16.x
       LicenseInfo: 'MIT'

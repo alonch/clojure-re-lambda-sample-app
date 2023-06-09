@@ -1,10 +1,14 @@
 (ns webhook.core
-  (:require ["xhr2" :as xhr2]
-            [clojure.core.async :refer [take!]]
-            [mergify.core :as mergify]
-            [pagerduty.core :as pagerduty]
-            [re-lambda.core :as rl]
-            [utils.core :refer [clj->json]]))
+  (:require
+   [clojure.core.async :refer [take!]]
+   [mergify.core :as mergify]
+   [pagerduty.core :as pagerduty]
+   [re-lambda.core :as rl]
+   [utils.core :refer [clj->json]]
+   ["https" :as https]
+   ["aws-xray-sdk-core" :as aws-x-ray]
+   ["xhr2" :as xhr2]))
+
 
  ;; Fix cljs-http.client nodejs incompatibility
 
@@ -40,6 +44,7 @@
 
 (defn handler [event _context callback]
   (do
+    (. aws-x-ray captureHTTPsGlobal https)
     (set! js/XMLHttpRequest xhr2)
     (take! (on-indendent-webhook event)
            #(callback nil (clj->js %)))))

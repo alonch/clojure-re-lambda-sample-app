@@ -2,6 +2,7 @@
   "name": "xhr2-layer",
   "version": "0.0.1",
   "dependencies": {
-    "xhr2": "^0.2.1"
+    "xhr2": "^0.2.1",
+    "aws-xray-sdk-core": "^3.5.0"
   }
 }

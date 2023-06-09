@@ -1,6 +1,7 @@
 {:source-paths ["src"]
  :dependencies [[cljs-http/cljs-http "0.1.46"]]
- :npm-deps {"xhr2" " 0.2.1"} 
+ :npm-deps {"xhr2" " 0.2.1"
+            "aws-xray-sdk-core" "^3.5.0"} 
  :repl-options {:nrepl-middleware [shadow.cljs.devtools.server.nrepl/middleware]}
  :dev-http {8080 "target/"}
  :builds {:test {:target    :node-test
