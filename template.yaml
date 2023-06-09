@@ -16,12 +16,14 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: ./
-      Handler: webhook.core
-      Runtime: java11
+      Handler: script.handler
+      Runtime: nodejs16.x
       MemorySize: 256
       Architectures:
         - arm64
       Tracing: Active
+      Layers:
+        - !Ref Xhr2Layer
       Environment:
         Variables:
           MERGIFY_API_KEY: '{{resolve:secretsmanager:/lambdas/pagerduty-mergify-integration/mergify-api-key}}'
@@ -48,6 +50,18 @@ Resources:
         UsagePlan:
           CreateUsagePlan: PER_API
           UsagePlanName: GatewayAuthorization
+
+  Xhr2Layer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: dependencies
+      Description: Dependencies for clojure sample app
+      ContentUri: dependencies/
+      CompatibleRuntimes:
+        - nodejs6.10
+        - nodejs8.10
+      LicenseInfo: 'MIT'
+      RetentionPolicy: Retain
 
 Outputs:
   WebEndpoint:

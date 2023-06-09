@@ -7,7 +7,7 @@
 (set! js/XMLHttpRequest xhr2) ;; Fix cljs-http.client nodejs incompatibility
 
 (defn get-mergify-api-key []
-  (or (get env "MERGIFY_API_KEY") "ABC"))
+  (or (get (env) "MERGIFY_API_KEY") (throw "Missing MERGIFY_API_KEY environment variable")))
 
 (defn parse-response [_event _response {:keys [http-delete http-put]}]
   (or http-delete http-put))

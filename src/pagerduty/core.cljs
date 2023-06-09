@@ -26,7 +26,9 @@
           
 
 (defn get-pagerduty-api-key []
-  (or (get env "PAGERDUTY_API_KEY") "ABC"))
+  (or (get (env) "PAGERDUTY_API_KEY") (throw "Missing PAGERDUTY_API_KEY environment variable")))
+
+(comment (get-pagerduty-api-key))
 
 (def fetch-incidents (create-event-handler
                       pagerduty-handler

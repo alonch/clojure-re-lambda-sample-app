@@ -3,9 +3,10 @@
             [clojure.core.async :refer [take!]]
             [mergify.core :as mergify]
             [pagerduty.core :as pagerduty]
-            [re-lambda.core :as rl]))
+            [re-lambda.core :as rl]
+            [utils.core :refer [clj->json]]))
 
-(set! js/XMLHttpRequest xhr2) ;; Fix cljs-http.client nodejs incompatibility
+ ;; Fix cljs-http.client nodejs incompatibility
 
 (defn on-pagerduty-event [_event incidents]
   (let
@@ -21,7 +22,11 @@
 (defn parse-response [_event _response {:keys [mergify-freeze mergify-unfreeze]}]
   (let [result (or mergify-freeze mergify-unfreeze)]
     {:statusCode (:status result)
-     :body (:body result)}))
+     :body (-> result
+               :body
+               clj->json)}))
+
+(comment (parse-response {} {} {:mergify-freeze {:status 404 :body {:details "hello world"}}}))
 
 (defn pagerduty-incidents []
   (pagerduty/fetch-incidents ["PLCR373" "PE7V774" "PVP8PO3"]))
@@ -34,7 +39,9 @@
                             :parser parse-response}))
 
 (defn handler [event _context callback]
-  (take! (on-indendent-webhook event)
-         #(callback nil %)))
+  (do
+    (set! js/XMLHttpRequest xhr2)
+    (take! (on-indendent-webhook event)
+           #(callback nil (clj->js %)))))
 
 (comment (handler {} {} println))

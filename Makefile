@@ -1,4 +1,3 @@
 build-ClojureAwsLambdaJavaFunction:
-	lein uberjar
-	mkdir -p $(ARTIFACTS_DIR)/lib
-	mv target/uberjar/bootstrap.jar $(ARTIFACTS_DIR)/lib
+	yarn shadow-cljs release lib
+	mv dist/script.js $(ARTIFACTS_DIR)/

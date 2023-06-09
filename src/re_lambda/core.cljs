@@ -16,6 +16,9 @@
           resolved-work (if (channel? work)
                           (<! work)
                           work)]
+      ;; (println "===========")
+      ;; (println side-effect args)
+      ;; (println resolved-work) 
       (>! channel {key resolved-work})
       (a/close! channel))))
 
