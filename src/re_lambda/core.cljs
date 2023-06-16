@@ -1,7 +1,8 @@
 (ns re-lambda.core
   (:require [cljs.core.async.impl.channels :refer [ManyToManyChannel]]
             [cljs.core.async.impl.protocols :refer [Channel]]
-            [clojure.core.async :as a :refer [<! >! go]]))
+            [clojure.core.async :as a :refer [<! >! go]]
+            [utils.core :refer [clj->json]]))
 
 
 (defn channel?
@@ -63,3 +64,8 @@
             side-effect-channel (apply-side-effects side-effects response)
             res (parser event response (<! (a/into {} side-effect-channel)))]
         res))))
+
+(defn ring->apigw [response]
+  (clj->js
+   {:statusCode (:status response)
+    :body (-> response :body clj->json)}))

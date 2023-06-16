@@ -1,13 +1,11 @@
 (ns webhook.core
-  (:require
-   [clojure.core.async :refer [take!]]
-   [mergify.core :as mergify]
-   [pagerduty.core :as pagerduty]
-   [re-lambda.core :as rl]
-   [utils.core :refer [clj->json]]
-   ["https" :as https]
-   ["aws-xray-sdk-core" :as aws-x-ray]
-   ["xhr2" :as xhr2]))
+  (:require ["aws-xray-sdk-core" :as aws-x-ray]
+            ["https" :as https]
+            ["xhr2" :as xhr2]
+            [clojure.core.async :refer [take!]]
+            [mergify.core :as mergify]
+            [pagerduty.core :as pagerduty]
+            [re-lambda.core :as rl]))
 
 
  ;; Fix cljs-http.client nodejs incompatibility
@@ -24,11 +22,7 @@
 (comment (on-pagerduty-event {} []))
 
 (defn parse-response [_event _response {:keys [mergify-freeze mergify-unfreeze]}]
-  (let [result (or mergify-freeze mergify-unfreeze)]
-    {:statusCode (:status result)
-     :body (-> result
-               :body
-               clj->json)}))
+  (or mergify-freeze mergify-unfreeze))
 
 (comment (parse-response {} {} {:mergify-freeze {:status 404 :body {:details "hello world"}}}))
 
@@ -47,6 +41,6 @@
     (. aws-x-ray captureHTTPsGlobal https)
     (set! js/XMLHttpRequest xhr2)
     (take! (on-indendent-webhook event)
-           #(callback nil (clj->js %)))))
+           #(callback nil (rl/ring->apigw %)))))
 
 (comment (handler {} {} println))
