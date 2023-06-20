@@ -16,4 +16,9 @@
 
                 ;; :devtools {:before-load-async webhook.core/stop
                 ;;            :after-load webhook.core/start}
+                }
+          :dev {:target :node-library
+                :exports {:handler webhook.core/on-indendent-webhook
+                          :fetchIncidents pagerduty.core/main}
+                :output-to "dist/dev-script.js" 
                 }}}

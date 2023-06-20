@@ -45,14 +45,14 @@
 
 (defn parse-queue-status [queue-name _response {resp :http-get}]
   (let [{status :status
-          body :body} resp]
+         body :body} resp]
     (println resp)
     (cond
       (= status 404) {}
       (= status 200) (mergify-map-queue-response body)
       :else (throw (ex-info (mergify-response-invalid-reason status)
                             (assoc body :queue queue-name))))))
-  
+
 
 (comment (parse-queue-status {} {} {:http-get {:status 200
                                                :body {:queue_freezes [{:name "low" :reason "Incident"}]}}}))
@@ -102,19 +102,20 @@
 
 (comment (apply-queue-status-handler {:low "hello world"} {:low "hello world"} "ABC")
          {})
- 
-(defn parse-apply-queue-status [[decired-queues current-queues _mergify-api-key] 
-                                _response 
-                                {resp-put :http-put resp-delete :http-delete}]
-  (let [resp (or resp-put resp-delete)
+
+(defn parse-apply-queue-status [_event
+                                _response
+                                {:keys [http-put http-delete]}]
+  (let [resp (or http-put http-delete)
         {status :status
-         body :body} resp] 
+         body :body} resp]
     (cond
-      (contains?  #{204 200} status) (mergify-map-queue-response body) 
-      :else (throw (ex-info (mergify-response-invalid-reason status) 
-                            {:body body 
-                             :decired-queues decired-queues
-                             :current-queues current-queues})))))
+      (nil? resp) {}
+      (contains?  #{204 200} status) (mergify-map-queue-response body)
+      :else (throw (ex-info (mergify-response-invalid-reason status)
+                            {:body body})))))
+
+;; (comment (parse-apply-queue-status ))
 
 (def apply-queue-status (create-event-handler
                          apply-queue-status-handler

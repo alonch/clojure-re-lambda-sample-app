@@ -30,16 +30,22 @@
 
 (defn apply-side-effects
   [side-effects response]
-  (let [channel (a/chan (count response))
+  (let [side-effects-count (count response)
+        channel (a/chan side-effects-count)
         zip-with-side-effects (fn [[key args]]
                                 (let [side-effect (key side-effects)]
                                   (when side-effect
-                                    [key [side-effect args]])))]
-    (go (a/pipeline-async
-         (count response) ;; parallel
-         channel          ;; output chanel
-         apply-async      ;; map function
-         (a/to-chan! (map zip-with-side-effects response)))) ;; input channel
+                                    [key [side-effect args]])))] 
+    (go
+      (cond
+        (= side-effects-count 0) (do 
+                                   (>! channel {})
+                                   (a/close! channel))
+        :else (a/pipeline-async
+               side-effects-count ;; parallel
+               channel          ;; output chanel
+               apply-async      ;; map function
+               (a/to-chan! (map zip-with-side-effects response))))) ;; input channel
     channel))
 
 (defn apply-co-effects

@@ -10,15 +10,18 @@
 (defn on-pagerduty-event [_event incidents]
   (let
    [incident-count (count incidents)
-    reason (str "Freezing the queue due to " incident-count " active incidents on PagerDuty")]
-    (cond-> {}
-      (> incident-count 0) (assoc :mergify-apply-queue-status [{:low reason}]))))
+    reason (str "Freezing the queue due to " incident-count " active incidents on PagerDuty")
+    initial-queue-state {:mergify-apply-queue-status [{}]}]
+    (cond-> 
+     initial-queue-state
+     (> incident-count 0) (assoc :mergify-apply-queue-status [{:low reason}]))))
 
 (comment (on-pagerduty-event {} [1 2 3]))
 (comment (on-pagerduty-event {} []))
 
-(defn parse-response [_event _response {:keys [mergify-freeze mergify-unfreeze]}]
-  (or mergify-freeze mergify-unfreeze))
+(defn parse-response [_event _response {:keys [mergify-apply-queue-status]}]
+  {:status 200
+   :body mergify-apply-queue-status})
 
 (comment (parse-response {} {} {:mergify-freeze {:status 404 :body {:details "hello world"}}}))
 
