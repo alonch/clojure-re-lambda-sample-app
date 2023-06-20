@@ -5,6 +5,11 @@
             [utils.core :refer [clj->json]]))
 
 
+(defn ring->apigw [response]
+  (clj->js
+   {:statusCode (:status response)
+    :body (-> response :body clj->json)}))
+
 (defn channel?
   [x]
   (or (satisfies? Channel x)
@@ -57,15 +62,13 @@
             :or {co-effects []
                  side-effects {}
                  parser (fn [_event response _side-effects-results] response)}}]
-  (fn [& [event]]
+  (fn [event & [_context callback]]
     (go
       (let [co-effects-channel (apply-co-effects co-effects)
             response (apply handler event (<! (a/into [] co-effects-channel)))
             side-effect-channel (apply-side-effects side-effects response)
             res (parser event response (<! (a/into {} side-effect-channel)))]
+        (when (some? callback) (callback nil (cond
+                                               (contains? res :body) (ring->apigw res)
+                                               :else res)))
         res))))
-
-(defn ring->apigw [response]
-  (clj->js
-   {:statusCode (:status response)
-    :body (-> response :body clj->json)}))

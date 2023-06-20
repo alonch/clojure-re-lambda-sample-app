@@ -1,5 +1,6 @@
 {:source-paths ["src"]
- :dependencies [[cljs-http/cljs-http "0.1.46"]]
+ :dependencies [[cljs-http/cljs-http "0.1.46"]
+                [juji/editscript "0.6.3"]]
  :npm-deps {"xhr2" " 0.2.1"
             "aws-xray-sdk-core" "^3.5.0"} 
  :repl-options {:nrepl-middleware [shadow.cljs.devtools.server.nrepl/middleware]}
@@ -9,7 +10,7 @@
                  :ns-regexp "-test$"
                  :autorun   true}
           :lib {:target :node-library
-                :exports {:handler webhook.core/handler
+                :exports {:handler webhook.core/on-indendent-webhook
                           :fetchIncidents pagerduty.core/main}
                 :output-to "dist/script.js"
 
