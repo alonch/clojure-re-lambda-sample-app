@@ -21,7 +21,7 @@
     :else "Error on Mergify Servers while trying to get frozen queue status"))
 
 (defn mergify-request [mergify-api-key queue-name]
-  (let [url (str "https://api.mergify.com/v1/repos/janeapp/jane/queue/" queue-name "/freeze")
+  (let [url (str "https://api.mergify.com/v1/repos/janeapp/jane/queue/" (name queue-name) "/freeze")
         options {:headers {"Content-Type" "application/json",
                            "Authorization" (str "Bearer " mergify-api-key)}}]
     [url options]))
@@ -70,21 +70,39 @@
 (defn apply-queue-status-handler [decired-queues current-queues mergify-api-key]
   (let [wrapper {:title "frozen queues"} ;; to prevent editscript from replacing the whole map 
         queue-diff (e/diff (merge wrapper current-queues) (merge wrapper decired-queues))
-        [& [[[queue] op reason]]] (e/get-edits queue-diff)] ;; sample edit: [[:low] :+ "Incident in PD"]
+        [[[queue] op reason]] (e/get-edits queue-diff)] ;; sample edit: [[:low] :+ "Incident in PD"]
     (cond-> {}
-      ;; - deletion
+      ;; :- deletion
       (= :- op) (assoc :http-delete
                        (mergify-request mergify-api-key
                                         queue))
-      ;; r replace
-      ;; + addition
+      ;; :r replacement
+      ;; :+ addition
       (contains? #{:r :+} op) (assoc :http-put
                                      (mergify-request-freeze mergify-api-key
                                                              queue
                                                              reason)))))
 
-(comment (apply-queue-status-handler {:low "hello"} {} "ABC"))
+(comment (apply-queue-status-handler {:low "hello"} {} "ABC")
+         {:http-put
+          ["https://api.mergify.com/v1/repos/janeapp/jane/queue/:low/freeze"
+           {:headers {"Content-Type" "application/json", "Authorization" "Bearer ABC"},
+            :form-params {:reason "hello", :cascading true}}]})
 
+(comment (apply-queue-status-handler {} {:low "hello"} "ABC")
+         {:http-delete
+          ["https://api.mergify.com/v1/repos/janeapp/jane/queue/low/freeze"
+           {:headers {"Content-Type" "application/json", "Authorization" "Bearer ABC"}}]})
+
+(comment (apply-queue-status-handler {:low "hello world"} {:low "hello"} "ABC")
+         {:http-put
+          ["https://api.mergify.com/v1/repos/janeapp/jane/queue/low/freeze"
+           {:headers {"Content-Type" "application/json", "Authorization" "Bearer ABC"},
+            :form-params {:reason "hello world", :cascading true}}]})
+
+(comment (apply-queue-status-handler {:low "hello world"} {:low "hello world"} "ABC")
+         {})
+ 
 (defn parse-apply-queue-status [[decired-queues current-queues _mergify-api-key] 
                                 _response 
                                 {resp-put :http-put resp-delete :http-delete}]
